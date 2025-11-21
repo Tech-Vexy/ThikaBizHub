@@ -12,11 +12,18 @@ export const metadata: Metadata = {
   description: "Connecting you with local businesses in Thika, Kenya. Discover deals, share experiences, and find verified businesses near you.",
   keywords: "Thika, Kenya, business directory, local businesses, deals, discounts",
   authors: [{ name: "ThikaBizHub Team" }],
+  manifest: "/manifest.json",
   openGraph: {
     title: "ThikaBizHub - Your Local Business Directory",
     description: "Connecting you with local businesses in Thika, Kenya",
     type: "website",
     locale: "en_US",
+  },
+  themeColor: "#9333ea",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
   },
 };
 

@@ -6,7 +6,7 @@ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, UserCr
 import { useRouter } from 'next/navigation';
 
 // Function to call the backend API to create a user document
-const createUserDocument = async (user: UserCredential['user'], referralCode?: string) => {
+const createUserDocument = async (user: UserCredential['user']) => {
   if (!user) return;
 
   const idToken = await user.getIdToken();
@@ -16,7 +16,7 @@ const createUserDocument = async (user: UserCredential['user'], referralCode?: s
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`,
     },
-    body: JSON.stringify({ referralCode }),
+    body: JSON.stringify({}),
   });
   
   return response.json();
@@ -29,15 +29,6 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Check for referral code in URL params
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref');
-    if (refCode) {
-      localStorage.setItem('pendingReferralCode', refCode);
-    }
-  }, []);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -45,19 +36,8 @@ const LoginPage = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
-      // Get pending referral code from localStorage
-      const referralCode = localStorage.getItem('pendingReferralCode');
-      
-      // Create user document with referral code if available
-      const result = await createUserDocument(userCredential.user, referralCode || undefined);
-      
-      // Clear the pending referral code
-      if (referralCode) {
-        localStorage.removeItem('pendingReferralCode');
-        if (result.referralApplied) {
-          alert('Referral code applied successfully! You\'ve earned a bonus.');
-        }
-      }
+      // Create user document
+      await createUserDocument(userCredential.user);
       
       router.push('/admin');
     } catch (error: any) {
@@ -74,19 +54,8 @@ const LoginPage = () => {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       
-      // Get pending referral code from localStorage
-      const referralCode = localStorage.getItem('pendingReferralCode');
-      
-      // Create user document with referral code if available
-      const result = await createUserDocument(userCredential.user, referralCode || undefined);
-      
-      // Clear the pending referral code
-      if (referralCode) {
-        localStorage.removeItem('pendingReferralCode');
-        if (result.referralApplied) {
-          alert('Referral code applied successfully! You\'ve earned a bonus.');
-        }
-      }
+      // Create user document
+      await createUserDocument(userCredential.user);
       
       router.push('/admin');
     } catch (error: any) {

@@ -8,17 +8,13 @@ For production deployment, you need to create the following composite indexes in
 - **Fields**: `inviterId` (Ascending), `createdAt` (Descending)
 - **Query**: For fetching user's sent invites ordered by date
 
-### 2. Referrals Collection  
-- **Fields**: `referrerId` (Ascending), `status` (Ascending), `createdAt` (Descending)
-- **Query**: For fetching user's referrals filtered by status
-
-### 3. Businesses Collection
+### 2. Businesses Collection
 - **Fields**: `isApproved` (Ascending), `category` (Ascending), `createdAt` (Descending)  
 - **Query**: For business directory filtering by category
 - **Fields**: `isApproved` (Ascending), `location.county` (Ascending), `createdAt` (Descending)
 - **Query**: For business directory filtering by location
 
-### 4. Users Collection
+### 3. Users Collection
 - **Fields**: `role` (Ascending), `createdAt` (Descending)
 - **Query**: For admin dashboard user management
 
@@ -64,15 +60,6 @@ When you see index requirement errors in development:
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "inviterId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "referrals", 
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "referrerId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },

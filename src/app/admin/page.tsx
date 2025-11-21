@@ -28,6 +28,11 @@ interface Business {
   whatsapp: string;
   description: string;
   approved: boolean;
+  address?: string;
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 const AdminPage = () => {
@@ -245,6 +250,22 @@ const AdminPage = () => {
                       <p className="text-sm text-gray-600 mb-2">{business.category}</p>
                       <p className="text-sm">{business.description}</p>
                       <p className="text-sm mt-2">WhatsApp: {business.whatsapp}</p>
+                      {business.address && (
+                        <p className="text-sm mt-1">Address: {business.address}</p>
+                      )}
+                      {business.coordinates && (
+                        <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded">
+                          <p className="text-xs text-green-800 font-medium">📍 Location Pinned</p>
+                          <a 
+                            href={`https://www.google.com/maps?q=${business.coordinates.latitude},${business.coordinates.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 hover:underline"
+                          >
+                            View on Google Maps
+                          </a>
+                        </div>
+                      )}
                       <div className="flex justify-end space-x-2 mt-4">
                         <button onClick={() => handleReject('businesses', business.id)} className="bg-red-500 text-white font-bold py-1 px-3 rounded text-sm">Reject</button>
                         <button onClick={() => handleApprove('businesses', business.id)} className="bg-green-500 text-white font-bold py-1 px-3 rounded text-sm">Approve</button>

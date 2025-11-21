@@ -10,8 +10,6 @@ interface Analytics {
     totalBusinesses: number;
     approvedBusinesses: number;
     pendingBusinesses: number;
-    totalReferrals: number;
-    successfulReferrals: number;
     totalInvites: number;
   };
   growth: {
@@ -149,12 +147,6 @@ export default function AnalyticsPage() {
           color="green"
         />
         <StatCard
-          title="Successful Referrals"
-          value={analytics.overview.successfulReferrals}
-          icon={TrendingUp}
-          color="purple"
-        />
-        <StatCard
           title="Approved Businesses"
           value={analytics.overview.approvedBusinesses}
           icon={Award}
@@ -169,12 +161,6 @@ export default function AnalyticsPage() {
           value={analytics.overview.pendingBusinesses}
           icon={Calendar}
           color="yellow"
-        />
-        <StatCard
-          title="Total Referrals"
-          value={analytics.overview.totalReferrals}
-          icon={BarChart3}
-          color="indigo"
         />
         <StatCard
           title="Total Invites"

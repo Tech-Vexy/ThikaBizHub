@@ -15,10 +15,6 @@ export async function POST(req: NextRequest) {
         const decodedToken = await getAuth(admin.app()).verifyIdToken(idToken);
         const { uid, email } = decodedToken;
 
-        // Get referral code from request body if provided
-        const body = await req.json().catch(() => ({}));
-        const { referralCode } = body;
-
         const db = getFirestore(admin.app());
         const userRef = db.collection('users').doc(uid);
         const userDoc = await userRef.get();
@@ -38,44 +34,6 @@ export async function POST(req: NextRequest) {
                 createdAt: new Date().toISOString(),
             };
 
-            // Handle referral code if provided
-            if (referralCode && !isFirstUser) {
-                try {
-                    // Find the referrer by referral code
-                    const referrerSnapshot = await db.collection('users')
-                        .where('referralCode', '==', referralCode.toUpperCase())
-                        .get();
-                    
-                    if (!referrerSnapshot.empty) {
-                        const referrerDoc = referrerSnapshot.docs[0];
-                        const referrerId = referrerDoc.id;
-                        const referrerData = referrerDoc.data();
-                        
-                        // Add referral info to user
-                        userData.usedReferralCode = referralCode.toUpperCase();
-                        userData.referredBy = referrerId;
-                        
-                        // Create referral record
-                        const referralData = {
-                            referrerId,
-                            referrerEmail: referrerData?.email,
-                            referredUserId: uid,
-                            referredEmail: email,
-                            referralCode: referralCode.toUpperCase(),
-                            status: 'completed',
-                            rewardAmount: 10, // $10 reward for successful referral
-                            createdAt: new Date().toISOString(),
-                            completedAt: new Date().toISOString(),
-                        };
-                        
-                        await db.collection('referrals').add(referralData);
-                    }
-                } catch (referralError) {
-                    console.error('Error processing referral:', referralError);
-                    // Don't fail user creation if referral processing fails
-                }
-            }
-
             await userRef.set(userData);
 
             // If this is the first user (admin), also set custom claims
@@ -90,8 +48,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({ 
                 message: 'User document created successfully',
-                role: 'user',
-                referralApplied: !!userData.usedReferralCode
+                role: 'user'
             }, { status: 201 });
         }
 

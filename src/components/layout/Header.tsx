@@ -64,8 +64,8 @@ const Header = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/referrals" className="text-gray-700 hover:text-purple-600 font-medium transition-colors duration-300">
-                  Referrals
+                <Link href="/events" className="text-gray-700 hover:text-purple-600 font-medium transition-colors duration-300">
+                  Events
                 </Link>
               </li>
               <li>
@@ -90,7 +90,19 @@ const Header = () => {
                       Analytics
                     </Link>
                   </li>
+                  <li>
+                    <Link href="/insights" className="text-gray-700 hover:text-purple-600 font-medium transition-colors duration-300">
+                      Insights
+                    </Link>
+                  </li>
                 </>
+              )}
+              {user && (
+                <li>
+                  <Link href="/favorites" className="text-gray-700 hover:text-purple-600 font-medium transition-colors duration-300">
+                    Favorites
+                  </Link>
+                </li>
               )}
             </ul>
           </nav>
@@ -169,8 +181,8 @@ const Header = () => {
               <Link href="/proof-of-visit" className="text-gray-700 hover:text-purple-600 font-medium py-2" onClick={closeMobileMenu}>
                 Proof of Visit
               </Link>
-              <Link href="/referrals" className="text-gray-700 hover:text-purple-600 font-medium py-2" onClick={closeMobileMenu}>
-                Referrals
+              <Link href="/events" className="text-gray-700 hover:text-purple-600 font-medium py-2" onClick={closeMobileMenu}>
+                Events
               </Link>
               <Link href="/invites" className="text-gray-700 hover:text-purple-600 font-medium py-2" onClick={closeMobileMenu}>
                 Invites

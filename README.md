@@ -10,19 +10,43 @@ A comprehensive business directory and community platform for Thika and surround
 - **User Profiles**: Customizable user profiles with avatars and bio
 - **Admin Dashboard**: Complete business and user management system
 - **Responsive Design**: Mobile-first design that works on all devices
+- **PWA Support**: Install as a mobile app with offline capabilities
 
 ### Growth & Engagement
-- **Referral System**: Users can invite others and earn rewards ($10 per successful referral)
 - **Invite System**: Send targeted invitations (user, business, admin types)
 - **Notification System**: Real-time notifications for user actions
 - **Analytics Dashboard**: Comprehensive insights and reporting
+- **Events Calendar**: Community events with date filtering and RSVP
+- **Favorites/Bookmarks**: Save and manage favorite businesses
 
 ### Business Features
 - **Business Listings**: Detailed business profiles with images, contact info, and location
 - **Premium Listings**: Enhanced visibility for premium businesses
 - **Category & Location Filtering**: Find businesses by type and location
+- **Location Pinning**: Businesses can pin their exact GPS coordinates for easy navigation
+- **Get Directions**: Integrated Google Maps directions for pinned locations
+- **Business Hours**: Display operating hours and open/closed status
+- **Multi-Image Gallery**: Upload up to 5 photos per business
+- **Social Media Integration**: Link Facebook, Instagram, Twitter profiles
+- **WhatsApp Integration**: Direct click-to-chat with pre-filled messages
 - **Proof of Visit**: Photo verification system for business visits
-- **Reviews & Ratings**: Community-driven business reviews (planned)
+
+### Reviews & Ratings
+- **Customer Reviews**: Leave detailed reviews with star ratings
+- **Photo Reviews**: Upload photos with reviews
+- **Rating Calculation**: Automatic average rating updates
+- **Review Management**: Business owners can respond
+
+### Social Proof & Trust
+- **View Counters**: Track business listing views
+- **Trending Badges**: Highlight popular businesses
+- **Verified Listings**: Admin-approved business verification
+- **Report/Flag System**: Report incorrect information or inappropriate content
+
+### Analytics & Insights
+- **Competitor Insights**: Industry benchmarks and category performance data
+- **Business Analytics**: Views, clicks, and engagement metrics
+- **Admin Analytics**: Platform-wide statistics and trends
 
 ### Technical Features
 - **Scalable Architecture**: Optimized for performance and growth
@@ -125,14 +149,6 @@ service cloud.firestore {
                              request.auth.token.role == 'admin');
     }
     
-    // Referrals - users can read/write their own
-    match /referrals/{referralId} {
-      allow read, write: if request.auth != null && 
-                        (request.auth.uid == resource.data.referrerId || 
-                         request.auth.uid == resource.data.referredUserId);
-      allow create: if request.auth != null;
-    }
-    
     // Invites - users can read/write their own
     match /invites/{inviteId} {
       allow read: if request.auth != null;
@@ -180,9 +196,6 @@ Fields: category (Ascending), isApproved (Ascending), createdAt (Descending)
 Collection: businesses
 Fields: isApproved (Ascending), location.county (Ascending), createdAt (Descending)
 
-Collection: referrals
-Fields: referrerId (Ascending), status (Ascending), createdAt (Descending)
-
 Collection: invites
 Fields: inviterId (Ascending), status (Ascending), createdAt (Descending)
 
@@ -205,7 +218,6 @@ src/
 │   ├── login/             # Authentication
 │   ├── profile/           # User profiles
 │   ├── proof-of-visit/    # Visit verification
-│   ├── referrals/         # Referral system
 │   └── globals.css        # Global styles
 ├── components/
 │   ├── layout/            # Layout components
@@ -244,8 +256,7 @@ npm run type-check
 ### Key Development Notes
 
 1. **Authentication**: First user automatically becomes admin
-2. **Referral Codes**: Automatically generated as 8-character alphanumeric codes
-3. **Caching**: Implement Redis in production for better performance
+2. **Caching**: Implement Redis in production for better performance
 4. **Images**: Upload business images to Firebase Storage
 5. **Notifications**: Uses React Context for real-time updates
 
@@ -332,19 +343,6 @@ Ensure all environment variables are set in your production environment:
 }
 ```
 
-### Referrals Collection
-```typescript
-{
-  code: string;
-  referrerId: string;
-  referredUserId?: string;
-  status: 'pending' | 'completed';
-  reward: number;
-  createdAt: string;
-  completedAt?: string;
-}
-```
-
 ### Invites Collection
 ```typescript
 {
@@ -405,7 +403,6 @@ For support and questions:
 - [x] Basic business directory
 - [x] User authentication
 - [x] Admin dashboard
-- [x] Referral system
 - [x] Invite system
 - [x] Analytics dashboard
 

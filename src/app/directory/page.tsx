@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Filter, Grid, List, MapPin, Phone, Globe, Star } from 'lucide-react';
+import { Search, Filter, Grid, List, MapPin, Phone, Globe, Star, MessageCircle, TrendingUp, Eye } from 'lucide-react';
 import Link from 'next/link';
 import SearchFilter from '@/components/ui/SearchFilter';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 
 interface Business {
   id: string;
@@ -15,16 +16,31 @@ interface Business {
     town: string;
     address: string;
   };
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
   contact: {
     phone: string;
     email: string;
     whatsapp?: string;
   };
   website?: string;
+  socialMedia?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+  };
   images: string[];
   rating: number;
   reviewCount: number;
   isPremium: boolean;
+  stats?: {
+    views: number;
+    favorites: number;
+    clicks: number;
+  };
+  businessHours?: any;
 }
 
 interface PaginationInfo {
@@ -123,11 +139,30 @@ export default function DirectoryPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const BusinessCard = ({ business }: { business: Business }) => (
-    <div className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 ${business.isPremium ? 'ring-2 ring-yellow-400' : ''}`}>
+  const BusinessCard = ({ business }: { business: Business }) => {
+    const getWhatsAppLink = () => {
+      const phone = business.contact.whatsapp || business.contact.phone;
+      const message = `Hi! I found your business "${business.name}" on ThikaBizHub. I'd like to know more.`;
+      return `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+    };
+
+    const isTrending = business.stats && business.stats.views > 100;
+
+    return (
+    <div className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative ${business.isPremium ? 'ring-2 ring-yellow-400' : ''}`}>
+      <div className="absolute top-2 left-2 z-10">
+        <FavoriteButton businessId={business.id} />
+      </div>
+      
       {business.isPremium && (
-        <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs font-bold py-1 px-3">
-          PREMIUM
+        <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs font-bold py-1 px-3 flex items-center justify-between">
+          <span>PREMIUM</span>
+          {isTrending && (
+            <span className="flex items-center gap-1">
+              <TrendingUp className="h-3 w-3" />
+              Trending
+            </span>
+          )}
         </div>
       )}
       
@@ -146,6 +181,12 @@ export default function DirectoryPage() {
         <div className="absolute top-2 right-2 bg-white rounded-full px-2 py-1 text-xs font-medium text-gray-700">
           {business.category}
         </div>
+        {business.stats && business.stats.views > 0 && (
+          <div className="absolute bottom-2 right-2 bg-black/70 text-white rounded-full px-2 py-1 text-xs flex items-center gap-1">
+            <Eye className="h-3 w-3" />
+            {business.stats.views} views
+          </div>
+        )}
       </div>
 
       <div className="p-6">
@@ -177,23 +218,50 @@ export default function DirectoryPage() {
           )}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <Star className="h-4 w-4 text-yellow-400 fill-current" />
             <span className="text-sm text-gray-600 ml-1">
               {business.rating ? business.rating.toFixed(1) : '0.0'} ({business.reviewCount || 0} reviews)
             </span>
           </div>
-          <Link
-            href={`/business/${business.id}`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-          >
-            View Details
-          </Link>
         </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          {(business.contact.whatsapp || business.contact.phone) && (
+            <a
+              href={getWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+            >
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </a>
+          )}
+          {business.coordinates && (
+            <a
+              href={`https://www.google.com/maps?q=${business.coordinates.latitude},${business.coordinates.longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+            >
+              <MapPin className="h-4 w-4" />
+              Directions
+            </a>
+          )}
+        </div>
+        
+        <Link
+          href={`/business/${business.id}`}
+          className="block mt-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium text-center"
+        >
+          View Details
+        </Link>
       </div>
     </div>
   );
+};
 
   const BusinessListItem = ({ business }: { business: Business }) => (
     <div className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 ${business.isPremium ? 'ring-2 ring-yellow-400' : ''}`}>
@@ -257,12 +325,25 @@ export default function DirectoryPage() {
                   {business.rating ? business.rating.toFixed(1) : '0.0'} ({business.reviewCount || 0})
                 </span>
               </div>
-              <Link
-                href={`/business/${business.id}`}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-              >
-                View Details
-              </Link>
+              <div className="flex flex-col gap-2">
+                {business.coordinates && (
+                  <a
+                    href={`https://www.google.com/maps?q=${business.coordinates.latitude},${business.coordinates.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-1 justify-center"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    Directions
+                  </a>
+                )}
+                <Link
+                  href={`/business/${business.id}`}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                  View Details
+                </Link>
+              </div>
             </div>
           </div>
         </div>

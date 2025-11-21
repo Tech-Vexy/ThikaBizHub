@@ -27,7 +27,6 @@ export const collections = {
   users: collection(db, 'users'),
   businesses: collection(db, 'businesses'),
   categories: collection(db, 'categories'),
-  referrals: collection(db, 'referrals'),
   invites: collection(db, 'invites'),
   notifications: collection(db, 'notifications'),
   reviews: collection(db, 'reviews'),
@@ -66,14 +65,6 @@ export const REQUIRED_INDEXES = [
     fields: [
       { field: 'isApproved', order: 'ASCENDING' },
       { field: 'location.county', order: 'ASCENDING' },
-      { field: 'createdAt', order: 'DESCENDING' }
-    ]
-  },
-  {
-    collection: 'referrals',
-    fields: [
-      { field: 'referrerId', order: 'ASCENDING' },
-      { field: 'status', order: 'ASCENDING' },
       { field: 'createdAt', order: 'DESCENDING' }
     ]
   },

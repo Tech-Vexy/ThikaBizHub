@@ -27,10 +27,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Get total counts using Admin SDK
-    const [usersSnapshot, businessesSnapshot, referralsSnapshot, invitesSnapshot] = await Promise.all([
+    const [usersSnapshot, businessesSnapshot, invitesSnapshot] = await Promise.all([
       adminDb.collection('users').get(),
       adminDb.collection('businesses').get(),
-      adminDb.collection('referrals').get(),
       adminDb.collection('invites').get()
     ]);
 
@@ -42,11 +41,6 @@ export async function GET(request: NextRequest) {
     // Get pending businesses count
     const pendingBusinessesSnapshot = await adminDb.collection('businesses')
       .where('isApproved', '==', false)
-      .get();
-
-    // Get successful referrals count
-    const successfulReferralsSnapshot = await adminDb.collection('referrals')
-      .where('status', '==', 'completed')
       .get();
 
     // Get recent activity (last 30 days)
@@ -99,8 +93,6 @@ export async function GET(request: NextRequest) {
         totalBusinesses: businessesSnapshot.size,
         approvedBusinesses: approvedBusinessesSnapshot.size,
         pendingBusinesses: pendingBusinessesSnapshot.size,
-        totalReferrals: referralsSnapshot.size,
-        successfulReferrals: successfulReferralsSnapshot.size,
         totalInvites: invitesSnapshot.size
       },
       growth: {
